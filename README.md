@@ -5,11 +5,41 @@ Symbolic Framework for Modeling and Identification of Robot Dynamics
 
 Uses [Sympy](http://sympy.org) and [Numpy](http://www.numpy.org/) libraries.
 
-[![Build Status](https://travis-ci.org/cdsousa/SymPyBotics.png?branch=master)](https://travis-ci.org/cdsousa/SymPyBotics)
-
 ##### Citation:
 [![DOI](https://zenodo.org/badge/920/cdsousa/SymPyBotics.png)](http://dx.doi.org/10.5281/zenodo.11365)
 
+Install
+-------
+
+From git source:
+
+    git clone https://github.com/xu-yang16/SymPyBotics.git
+    cd sympybotics
+    python setup.py install
+
+Test Code
+-------
+```Python
+import sympy
+import sympybotics
+rbtdef = sympybotics.RobotDef('Example Robot', [('-pi/2', 0, 0, 'q+pi/2'), ( 'pi/2', 0, 0, 'q-pi/2')], dh_convention='standard')
+rbtdef.frictionmodel = {'Coulomb', 'viscous'} # options are None or a combination of 'Coulomb', 'viscous' and 'offset'
+rbtdef.gravityacc = sympy.Matrix([0.0, 0.0, -9.81]) # optional, this is the default value
+rbtdef.dynparms()
+rbt = sympybotics.RobotDynCode(rbtdef, verbose=True)
+
+rbt.geo.T[-1]
+rbt.kin.J[-1]
+tau_str = sympybotics.robotcodegen.robot_code_to_func('C', rbt.invdyn_code, 'tau_out', 'tau', rbtdef)
+rbt.calc_base_parms()
+rbt.dyn.baseparms
+```
+
+Modifications
+------
+1. `robotmodel.py`, `dynamics\dyn_parm_dep.py`, `dynamics\dynamics.py`: add `import math`
+2. `symcode\subexprs.py`: change line 142 to `sympy.utilities.iterables.iterable`
+3. `__compatibility__.py`: change line 7 and line 11 `if pyversion is 3` to `if pyversion == 3`
 
 Example
 -------
@@ -141,15 +171,6 @@ Author
 ------
 
 [Cristóvão Duarte Sousa](https://github.com/cdsousa)
-
-Install
--------
-
-From git source:
-
-    git clone https://github.com/cdsousa/SymPyBotics.git
-    cd sympybotics
-    python setup.py install
 
 License
 -------
